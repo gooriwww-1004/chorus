@@ -8,7 +8,7 @@ import google.generativeai as genai
 from config import CATEGORY_PROVIDERS, GEMINI_API_KEY
 from providers_registry import PROVIDERS
 
-MODEL = "gemini-2.5-flash-preview-04-17"
+MODEL = "gemini-2.0-flash"
 
 ROLE_LABELS = {
     "gemini_A": "분석가",

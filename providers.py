@@ -1,12 +1,9 @@
-# providers.py — 동기 방식 (Streamlit 완전 호환)
-import concurrent.futures
+# providers.py — 동기 순차 호출 + genai 매 호출마다 초기화
+import time
 import google.generativeai as genai
 from config import GEMINI_API_KEY
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-
-MODEL = "gemini-2.5-flash-preview-04-17"
+MODEL = "gemini-2.0-flash"
 
 SYSTEM_PROMPTS = {
     "gemini_A": "당신은 통계와 데이터에 강한 분석 전문가입니다. 숫자, 확률, 패턴을 중심으로 근거 있는 수치를 제시하며 논리적으로 답변하세요. 반드시 한국어로 답변하세요.",
@@ -16,10 +13,11 @@ SYSTEM_PROMPTS = {
 }
 
 def _call_sync(role_key: str, user_prompt: str) -> str:
-    """완전 동기 호출 — Streamlit 이벤트 루프 충돌 없음"""
     if not GEMINI_API_KEY:
         return "ERROR: GEMINI_API_KEY가 설정되지 않았습니다."
     try:
+        # 매 호출마다 새로 초기화 — 세션 오염 방지
+        genai.configure(api_key=GEMINI_API_KEY)
         model = genai.GenerativeModel(
             MODEL,
             system_instruction=SYSTEM_PROMPTS[role_key]
