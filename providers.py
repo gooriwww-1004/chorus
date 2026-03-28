@@ -3,7 +3,7 @@ import time
 import google.generativeai as genai
 from config import GEMINI_API_KEY
 
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPTS = {
     "gemini_A": "당신은 통계와 데이터에 강한 분석 전문가입니다. 숫자, 확률, 패턴을 중심으로 근거 있는 수치를 제시하며 논리적으로 답변하세요. 반드시 한국어로 답변하세요.",
