@@ -1,10 +1,12 @@
+# providers.py — 동기 방식 (Streamlit 완전 호환)
+import concurrent.futures
 import google.generativeai as genai
 from config import GEMINI_API_KEY
 
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
 
-MODEL = "gemini-2.5-flash"  # ← 2.5-flash 업그레이드
+MODEL = "gemini-2.5-flash-preview-04-17"
 
 SYSTEM_PROMPTS = {
     "gemini_A": "당신은 통계와 데이터에 강한 분석 전문가입니다. 숫자, 확률, 패턴을 중심으로 근거 있는 수치를 제시하며 논리적으로 답변하세요. 반드시 한국어로 답변하세요.",
@@ -13,17 +15,21 @@ SYSTEM_PROMPTS = {
     "gemini_D": "당신은 창의적인 아이디어와 다양한 관점을 제시하는 브레인스토밍 전문가입니다. 일반적인 답변 외에 색다른 시각과 참신한 아이디어를 적극 제안하세요. 반드시 한국어로 답변하세요.",
 }
 
-async def _call(role_key: str, user_prompt: str) -> str:
+def _call_sync(role_key: str, user_prompt: str) -> str:
+    """완전 동기 호출 — Streamlit 이벤트 루프 충돌 없음"""
     if not GEMINI_API_KEY:
         return "ERROR: GEMINI_API_KEY가 설정되지 않았습니다."
     try:
-        model = genai.GenerativeModel(MODEL, system_instruction=SYSTEM_PROMPTS[role_key])
-        resp = await model.generate_content_async(user_prompt)
+        model = genai.GenerativeModel(
+            MODEL,
+            system_instruction=SYSTEM_PROMPTS[role_key]
+        )
+        resp = model.generate_content(user_prompt)
         return resp.text
     except Exception as e:
         return f"ERROR: {role_key} 호출 실패 — {e}"
 
-async def call_gemini_A(prompt: str) -> str: return await _call("gemini_A", prompt)
-async def call_gemini_B(prompt: str) -> str: return await _call("gemini_B", prompt)
-async def call_gemini_C(prompt: str) -> str: return await _call("gemini_C", prompt)
-async def call_gemini_D(prompt: str) -> str: return await _call("gemini_D", prompt)
+def call_gemini_A(prompt: str) -> str: return _call_sync("gemini_A", prompt)
+def call_gemini_B(prompt: str) -> str: return _call_sync("gemini_B", prompt)
+def call_gemini_C(prompt: str) -> str: return _call_sync("gemini_C", prompt)
+def call_gemini_D(prompt: str) -> str: return _call_sync("gemini_D", prompt)
