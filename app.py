@@ -1,6 +1,9 @@
-# app.py — CHORUS AI v0.4  |  Gemini 2.5-Flash Ensemble  |  Cyberpunk UI
+# app.py — CHORUS AI v0.5  |  Gemini 2.5-Flash Ensemble  |  Cyberpunk UI
 
 import asyncio
+import nest_asyncio
+nest_asyncio.apply()   # Streamlit 이벤트 루프 충돌 방지
+
 import streamlit as st
 from ensemble import run_ensemble
 from config import CATEGORY_PROVIDERS, CATEGORY_LABELS
@@ -194,7 +197,8 @@ if not run_clicked:
 
 # ─── 앙상블 실행 ─────────────────────────────────────────────────────────────
 def run_sync(q, cat):
-    return asyncio.run(run_ensemble(q, cat))
+    loop = asyncio.get_event_loop()
+    return loop.run_until_complete(run_ensemble(q, cat))
 
 if run_clicked:
     if not question.strip():
